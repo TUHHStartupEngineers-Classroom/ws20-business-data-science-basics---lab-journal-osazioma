@@ -1,6 +1,6 @@
 ---
 title: "Journal (reproducible report)"
-author: "Joschka Schwarz"
+author: "Osaiyekemwen Agbonaye"
 date: "2020-11-05"
 output:
   html_document:
