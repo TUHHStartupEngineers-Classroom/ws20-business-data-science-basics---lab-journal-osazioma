@@ -1,0 +1,3 @@
+```{r, eval = FALSE}
+numbers <- 1:1000
+numbers[1:10]
