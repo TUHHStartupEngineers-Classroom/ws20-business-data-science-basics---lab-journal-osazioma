@@ -414,7 +414,7 @@ div.tocify {
 <p>This is an <code>.Rmd</code> file. It is plain text with special features. Any time you write just like this, it will be compiled to normal text in the website. If you put a # in front of your text, it will create a top level-header.</p>
 <div id="my-first-post" class="section level1">
 <h1><span class="header-section-number">1</span> My first post</h1>
-<p>Last compiled: 2020-11-22</p>
+<p>Last compiled: 2020-11-23</p>
 <p>Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left.</p>
 <div id="second-level-header" class="section level2">
 <h2><span class="header-section-number">1.1</span> Second level header</h2>
@@ -427,16 +427,168 @@ div.tocify {
 </div>
 <div id="my-second-post-note-the-order" class="section level1">
 <h1><span class="header-section-number">2</span> My second post (note the order)</h1>
-<p>Last compiled: 2020-11-22</p>
+<p>Last compiled: 2020-11-23</p>
 <p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
 </div>
 <div id="adding-r-stuff" class="section level1">
 <h1><span class="header-section-number">3</span> Adding R stuff</h1>
 <p>So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place.</p>
 <p>So, let’s say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:</p>
-<pre class="r"><code>samples &lt;- rnorm(100, mean=0, sd=1)
-hist(samples)</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>#Run libraries
+
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(readxl)
+library(readr)
+library(lubridate)
+library(&quot;writexl&quot;)
+#Importing the files
+
+bikes_tbl &lt;- read_excel(path = &quot;DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx&quot;)
+orderlines_tbl &lt;- read_excel(path = &quot;DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx&quot;)
+bikeshops_tbl &lt;- read_excel(path = &quot;DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx&quot;)
+#run data wrangling 
+glimpse(bike_orderlines_joined_tbl)</code></pre>
+<pre><code>## Rows: 15,644
+## Columns: 19
+## $ ...1           &lt;chr&gt; &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;, &quot;10&quot;, &quot;...
+## $ order.id       &lt;dbl&gt; 1, 1, 2, 2, 3, 3, 3, 3, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6...
+## $ order.line     &lt;dbl&gt; 1, 2, 1, 2, 1, 2, 3, 4, 5, 1, 1, 2, 3, 4, 1, 2, 3, 4...
+## $ order.date     &lt;dttm&gt; 2015-01-07, 2015-01-07, 2015-01-10, 2015-01-10, 201...
+## $ customer.id    &lt;dbl&gt; 2, 2, 10, 10, 6, 6, 6, 6, 6, 22, 8, 8, 8, 8, 16, 16,...
+## $ product.id     &lt;dbl&gt; 2681, 2411, 2629, 2137, 2367, 1973, 2422, 2655, 2247...
+## $ quantity       &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1...
+## $ model          &lt;chr&gt; &quot;Spectral CF 7 WMN&quot;, &quot;Ultimate CF SLX Disc 8.0 ETAP&quot;...
+## $ model.year     &lt;dbl&gt; 2021, 2020, 2021, 2019, 2020, 2020, 2020, 2021, 2020...
+## $ frame.material &lt;chr&gt; &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;aluminium&quot;,...
+## $ weight         &lt;dbl&gt; 13.80, 7.44, 14.06, 8.80, 11.50, 8.80, 8.20, 8.85, 1...
+## $ price          &lt;dbl&gt; 3119, 5359, 2729, 1749, 1219, 1359, 2529, 1559, 3899...
+## $ category       &lt;chr&gt; &quot;Mountain - Trail - Spectral&quot;, &quot;Road - Race - Ultima...
+## $ gender         &lt;chr&gt; &quot;female&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;u...
+## $ url            &lt;chr&gt; &quot;https://www.canyon.com/en-de/mountain-bikes/trail-b...
+## $ name           &lt;chr&gt; &quot;AlexandeRad&quot;, &quot;AlexandeRad&quot;, &quot;WITT-RAD&quot;, &quot;WITT-RAD&quot;...
+## $ location       &lt;chr&gt; &quot;Hamburg, Hamburg&quot;, &quot;Hamburg, Hamburg&quot;, &quot;Bremen, Bre...
+## $ lat            &lt;dbl&gt; 53.57532, 53.57532, 53.07379, 53.07379, 48.78234, 48...
+## $ lng            &lt;dbl&gt; 10.015340, 10.015340, 8.826754, 8.826754, 9.180819, ...</code></pre>
+<pre class="r"><code>bike_orderlines_joined_tbl &lt;- orderlines_tbl %&gt;%
+  left_join(bikes_tbl, by = c(&quot;product.id&quot; = &quot;bike.id&quot;)) %&gt;%
+  left_join(bikeshops_tbl, by = c(&quot;customer.id&quot; = &quot;bikeshop.id&quot;))
+
+bike_orderlines_joined_tbl %&gt;% 
+  select(category) %&gt;%
+  filter(str_detect(category, &quot;^road&quot;)) %&gt;% 
+  unique()</code></pre>
+<pre><code>## # A tibble: 0 x 1
+## # ... with 1 variable: category &lt;chr&gt;</code></pre>
+<pre class="r"><code>bike_orderlines_wrangled_tbl &lt;- bike_orderlines_joined_tbl %&gt;%
+  separate(col = category,
+           into = c(&quot;category.1&quot;, &quot;category.2&quot;, &quot;category.3&quot;),
+           sep = &quot; - &quot;)%&gt;%
+  mutate(total.price = price * quantity) %&gt;%
+  select(-...1, -gender) %&gt;%
+  select(-ends_with(&quot;.id&quot;)) %&gt;%
+  bind_cols(bike_orderlines_joined_tbl %&gt;% select(order.id)) %&gt;%
+  select(order.id, contains(&quot;order&quot;), contains(&quot;model&quot;), contains(&quot;category&quot;),
+         price, quantity, total.price,
+         everything()) %&gt;%
+  rename(bikeshop = name) %&gt;%
+  set_names(names(.) %&gt;% str_replace_all(&quot;\\.&quot;, &quot;_&quot;))
+
+bike_orderlines_wrangled_2_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
+  separate(col = location,
+           into = c(&quot;city&quot;, &quot;state&quot;),
+           sep = &quot;, &quot;)%&gt;%
+  select(order_id, contains(&quot;order&quot;), contains(&quot;model&quot;), contains(&quot;category&quot;),
+         price, quantity, total_price,
+         everything())
+
+#first solution for state 
+
+sales_by_state_tbl &lt;- bike_orderlines_wrangled_2_tbl %&gt;%
+  select(state, total_price) %&gt;%
+  group_by(state) %&gt;%
+  summarize(sales = sum(total_price)) %&gt;%
+  mutate(sales_text = scales::dollar(sales, big.mark = &quot;.&quot;,
+                                     decimal.mark = &quot;,&quot;,
+                                     prefix = &quot;&quot;,
+                                     suffix = &quot; Є&quot;))
+sales_by_state_tbl %&gt;%
+  ggplot(aes(x=state, y=sales))+
+  geom_col(fill = &quot;#FFDB6D&quot;)+
+  geom_label(aes(label=sales_text))+
+  geom_smooth(method=&quot;lm&quot;, se=FALSE)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;,
+                                                    decimal.mark = &quot;,&quot;,
+                                                    prefix = &quot;&quot;,
+                                                    suffix = &quot; Є&quot;))+
+  labs(
+    title = &quot;Revenue by state&quot;,
+    subtitle = &quot;Upward Trend&quot;,
+    x = &quot;&quot;,
+    y = &quot;Revenue&quot;
+  )</code></pre>
+<p><img src="journal_files/figure-html/plot-1.png" width="960" /></p>
+<pre class="r"><code>#second solution price 
+glimpse(bike_orderlines_wrangled_2_tbl)</code></pre>
+<pre><code>## Rows: 15,644
+## Columns: 19
+## $ order_id       &lt;dbl&gt; 1, 1, 2, 2, 3, 3, 3, 3, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6...
+## $ order_line     &lt;dbl&gt; 1, 2, 1, 2, 1, 2, 3, 4, 5, 1, 1, 2, 3, 4, 1, 2, 3, 4...
+## $ order_date     &lt;dttm&gt; 2015-01-07, 2015-01-07, 2015-01-10, 2015-01-10, 201...
+## $ model          &lt;chr&gt; &quot;Spectral CF 7 WMN&quot;, &quot;Ultimate CF SLX Disc 8.0 ETAP&quot;...
+## $ model_year     &lt;dbl&gt; 2021, 2020, 2021, 2019, 2020, 2020, 2020, 2021, 2020...
+## $ category_1     &lt;chr&gt; &quot;Mountain&quot;, &quot;Road&quot;, &quot;Mountain&quot;, &quot;Road&quot;, &quot;Mountain&quot;, ...
+## $ category_2     &lt;chr&gt; &quot;Trail&quot;, &quot;Race&quot;, &quot;Trail&quot;, &quot;Triathlon Bike&quot;, &quot;Dirt Ju...
+## $ category_3     &lt;chr&gt; &quot;Spectral&quot;, &quot;Ultimate&quot;, &quot;Neuron&quot;, &quot;Speedmax&quot;, &quot;Stitc...
+## $ price          &lt;dbl&gt; 3119, 5359, 2729, 1749, 1219, 1359, 2529, 1559, 3899...
+## $ quantity       &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1...
+## $ total_price    &lt;dbl&gt; 3119, 5359, 2729, 1749, 1219, 1359, 2529, 1559, 3899...
+## $ frame_material &lt;chr&gt; &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;aluminium&quot;,...
+## $ weight         &lt;dbl&gt; 13.80, 7.44, 14.06, 8.80, 11.50, 8.80, 8.20, 8.85, 1...
+## $ url            &lt;chr&gt; &quot;https://www.canyon.com/en-de/mountain-bikes/trail-b...
+## $ bikeshop       &lt;chr&gt; &quot;AlexandeRad&quot;, &quot;AlexandeRad&quot;, &quot;WITT-RAD&quot;, &quot;WITT-RAD&quot;...
+## $ city           &lt;chr&gt; &quot;Hamburg&quot;, &quot;Hamburg&quot;, &quot;Bremen&quot;, &quot;Bremen&quot;, &quot;Stuttgart...
+## $ state          &lt;chr&gt; &quot;Hamburg&quot;, &quot;Hamburg&quot;, &quot;Bremen&quot;, &quot;Bremen&quot;, &quot;Baden-Wür...
+## $ lat            &lt;dbl&gt; 53.57532, 53.57532, 53.07379, 53.07379, 48.78234, 48...
+## $ lng            &lt;dbl&gt; 10.015340, 10.015340, 8.826754, 8.826754, 9.180819, ...</code></pre>
+<pre class="r"><code>sales_by_state_year_tbl &lt;- bike_orderlines_wrangled_2_tbl %&gt;%
+  select(order_date, total_price, state) %&gt;%
+  mutate(year = year(order_date)) %&gt;%
+  group_by(year, state) %&gt;%
+  summarize(sales = sum(total_price)) %&gt;%
+  #theme(axis.text.x = element_text(angle = 45, hjust = 1))%&gt;%
+  ungroup()%&gt;%
+  mutate(sales_text = scales::dollar(sales, big.mark = &quot;.&quot;,
+                                     decimal.mark = &quot;,&quot;,
+                                     prefix = &quot;&quot;,
+                                     suffix = &quot; Є&quot;))
+
+sales_by_state_year_tbl %&gt;%
+  ggplot(aes(x=year, y=sales, fill = state))+
+  geom_col()+
+  facet_wrap(~ state)+
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;,
+                                                    decimal.mark = &quot;,&quot;,
+                                                    prefix = &quot;&quot;,
+                                                    suffix = &quot; Є&quot;))+
+  labs(
+    title = &quot;Revenue by Year and  the State&quot;,
+    subtitle = &quot;upward trend&quot;,
+    fill = &quot;States&quot;
+  )</code></pre>
+<p><img src="journal_files/figure-html/plot-2.png" width="960" /></p>
+<pre class="r"><code>#save the files
+bike_orderlines_wrangled_tbl %&gt;%
+  write_xlsx(&quot;DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.xlsx&quot;)
+bike_orderlines_wrangled_tbl %&gt;%
+  write_xlsx(&quot;DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.csv&quot;)
+bike_orderlines_wrangled_tbl %&gt;%
+  write_xlsx(&quot;DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds&quot;)
+
+#samples &lt;- rnorm(100, mean=0, sd=1)
+#hist(samples)</code></pre>
 <p>When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You’ll learn that all of these things and more can be customized in each R code block.</p>
 </div>
 
