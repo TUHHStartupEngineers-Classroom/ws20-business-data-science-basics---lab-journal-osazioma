@@ -103,7 +103,7 @@ sales_by_state_tbl <- bike_orderlines_wrangled_2_tbl %>%
   mutate(sales_text = scales::dollar(sales, big.mark = ".",
                                      decimal.mark = ",",
                                      prefix = "",
-                                     suffix = " Є"))
+                                     suffix = " \U20AC"))
 sales_by_state_tbl %>%
   ggplot(aes(x=state, y=sales))+
   geom_col(fill = "#FFDB6D")+
@@ -113,7 +113,7 @@ sales_by_state_tbl %>%
   scale_y_continuous(labels = scales::dollar_format(big.mark = ".",
                                                     decimal.mark = ",",
                                                     prefix = "",
-                                                    suffix = " Є"))+
+                                                    suffix = " \U20AC"))+
   labs(
     title = "Revenue by state",
     subtitle = "Upward Trend",
@@ -133,7 +133,7 @@ sales_by_state_year_tbl <- bike_orderlines_wrangled_2_tbl %>%
   mutate(sales_text = scales::dollar(sales, big.mark = ".",
                                      decimal.mark = ",",
                                      prefix = "",
-                                     suffix = " Є"))
+                                     suffix = " \U20AC"))
 
 sales_by_state_year_tbl %>%
   ggplot(aes(x=year, y=sales, fill = state))+
@@ -142,7 +142,7 @@ sales_by_state_year_tbl %>%
   scale_y_continuous(labels = scales::dollar_format(big.mark = ".",
                                                     decimal.mark = ",",
                                                     prefix = "",
-                                                    suffix = " Є"))+
+                                                    suffix = " \U20AC"))+
   labs(
     title = "Revenue by Year and  the State",
     subtitle = "upward trend",

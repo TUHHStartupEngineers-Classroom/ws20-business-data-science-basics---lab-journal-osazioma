@@ -414,7 +414,7 @@ div.tocify {
 <p>This is an <code>.Rmd</code> file. It is plain text with special features. Any time you write just like this, it will be compiled to normal text in the website. If you put a # in front of your text, it will create a top level-header.</p>
 <div id="my-first-post" class="section level1">
 <h1><span class="header-section-number">1</span> My first post</h1>
-<p>Last compiled: 2020-11-23</p>
+<p>Last compiled: 2020-12-01</p>
 <p>Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left.</p>
 <div id="second-level-header" class="section level2">
 <h2><span class="header-section-number">1.1</span> Second level header</h2>
@@ -427,7 +427,7 @@ div.tocify {
 </div>
 <div id="my-second-post-note-the-order" class="section level1">
 <h1><span class="header-section-number">2</span> My second post (note the order)</h1>
-<p>Last compiled: 2020-11-23</p>
+<p>Last compiled: 2020-12-01</p>
 <p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
 </div>
 <div id="adding-r-stuff" class="section level1">
@@ -512,7 +512,7 @@ sales_by_state_tbl &lt;- bike_orderlines_wrangled_2_tbl %&gt;%
   mutate(sales_text = scales::dollar(sales, big.mark = &quot;.&quot;,
                                      decimal.mark = &quot;,&quot;,
                                      prefix = &quot;&quot;,
-                                     suffix = &quot; Є&quot;))
+                                     suffix = &quot; \U20AC&quot;))
 sales_by_state_tbl %&gt;%
   ggplot(aes(x=state, y=sales))+
   geom_col(fill = &quot;#FFDB6D&quot;)+
@@ -522,7 +522,7 @@ sales_by_state_tbl %&gt;%
   scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;,
                                                     decimal.mark = &quot;,&quot;,
                                                     prefix = &quot;&quot;,
-                                                    suffix = &quot; Є&quot;))+
+                                                    suffix = &quot; \U20AC&quot;))+
   labs(
     title = &quot;Revenue by state&quot;,
     subtitle = &quot;Upward Trend&quot;,
@@ -563,7 +563,7 @@ glimpse(bike_orderlines_wrangled_2_tbl)</code></pre>
   mutate(sales_text = scales::dollar(sales, big.mark = &quot;.&quot;,
                                      decimal.mark = &quot;,&quot;,
                                      prefix = &quot;&quot;,
-                                     suffix = &quot; Є&quot;))
+                                     suffix = &quot; \U20AC&quot;))
 
 sales_by_state_year_tbl %&gt;%
   ggplot(aes(x=year, y=sales, fill = state))+
@@ -572,7 +572,7 @@ sales_by_state_year_tbl %&gt;%
   scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;,
                                                     decimal.mark = &quot;,&quot;,
                                                     prefix = &quot;&quot;,
-                                                    suffix = &quot; Є&quot;))+
+                                                    suffix = &quot; \U20AC&quot;))+
   labs(
     title = &quot;Revenue by Year and  the State&quot;,
     subtitle = &quot;upward trend&quot;,
@@ -587,7 +587,39 @@ bike_orderlines_wrangled_tbl %&gt;%
 bike_orderlines_wrangled_tbl %&gt;%
   write_xlsx(&quot;DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds&quot;)
 
-#samples &lt;- rnorm(100, mean=0, sd=1)
+#########################
+#Assignment 3
+library(dplyr)
+library(genius)
+library(spotifyr)
+library(plotly)
+library(ggplot2)
+
+id &lt;- &quot;355e1587681d43b9b387908de7f303df&quot;
+secret &lt;- &quot;d9096909cf974815af9f855efbe48445&quot;
+Sys.setenv(SPOTIFY_CLIENT_ID = id)
+Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
+access_token &lt;- get_spotify_access_token
+
+artist &lt;- &quot;wizkid&quot;
+artist_ID &lt;- get_artist_audio_features(artist)$artist_id[1]
+
+albums &lt;- get_artist_albums(artist_ID, include_groups = c(&quot;album&quot;), market = &quot;NI&quot;,
+                            authorization = access_token()) %&gt;%
+  mutate(num = row_number()) %&gt;%
+  select(name, release_date, total_tracks) %&gt;%
+  as_tibble()
+
+albums</code></pre>
+<pre><code>## # A tibble: 5 x 3
+##   name                       release_date total_tracks
+##   &lt;chr&gt;                      &lt;chr&gt;               &lt;int&gt;
+## 1 Made In Lagos              2020-10-29             14
+## 2 Sounds From The Other Side 2017-07-14             12
+## 3 Sounds From The Other Side 2017-07-14             12
+## 4 Ayo                        2014-09-17             19
+## 5 Superstar                  2011-07-01             17</code></pre>
+<pre class="r"><code>#samples &lt;- rnorm(100, mean=0, sd=1)
 #hist(samples)</code></pre>
 <p>When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You’ll learn that all of these things and more can be customized in each R code block.</p>
 </div>
