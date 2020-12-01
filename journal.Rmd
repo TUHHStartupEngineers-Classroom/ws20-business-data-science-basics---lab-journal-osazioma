@@ -156,6 +156,30 @@ bike_orderlines_wrangled_tbl %>%
 bike_orderlines_wrangled_tbl %>%
   write_xlsx("DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds")
 
+#########################
+#Assignment 3
+library(dplyr)
+library(genius)
+library(spotifyr)
+library(plotly)
+library(ggplot2)
+
+id <- "355e1587681d43b9b387908de7f303df"
+secret <- "d9096909cf974815af9f855efbe48445"
+Sys.setenv(SPOTIFY_CLIENT_ID = id)
+Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
+access_token <- get_spotify_access_token
+
+artist <- "wizkid"
+artist_ID <- get_artist_audio_features(artist)$artist_id[1]
+
+albums <- get_artist_albums(artist_ID, include_groups = c("album"), market = "NI",
+                            authorization = access_token()) %>%
+  mutate(num = row_number()) %>%
+  select(name, release_date, total_tracks) %>%
+  as_tibble()
+
+albums
 #samples <- rnorm(100, mean=0, sd=1)
 #hist(samples)
 ```
