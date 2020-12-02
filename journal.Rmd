@@ -49,6 +49,7 @@ So, let's say you are learning how to make a histogram in R. For example, maybe 
 ```{r plot, fig.width=10, fig.height=7}
 #Run libraries
 
+#libraries
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
@@ -56,6 +57,22 @@ library(readxl)
 library(readr)
 library(lubridate)
 library("writexl")
+library(genius)
+library(spotifyr)
+library(plotly)
+library(ggplot2)
+library(rvest)
+library(xopen)
+library(jsonlite)
+library(glue)
+library(stringi)
+library(furrr)
+library(RSQLite)
+library(httr)
+library(keyring)
+library(rstudioapi)
+library(stringr)
+library(purrr)
 #Importing the files
 
 bikes_tbl <- read_excel(path = "DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx")
@@ -180,8 +197,97 @@ albums <- get_artist_albums(artist_ID, include_groups = c("album"), market = "NI
   as_tibble()
 
 albums
+
+#Assignment3b
+source("C:/Users/osazi/Documents/ws20-business-data-science-basics---lab-journal-osazioma/Codes.R")
+artist <- "Ariana Grande"
+artist_ID <- get_artist_audio_features(artist)$artist_id[1]
+
+artist_ID
+albums <- get_artist_albums(artist_ID, include_groups = c("single"),
+                            authorization = access_token()) %>%
+  mutate(num = row_number())%>%
+  as_tibble()
+
+albums
+
+   
+#3.2
+url_home <- "https://www.rosebikes.com/bikes"
+bikes_home <- url_home %>%
+  read_html()
+
+bike_family_tbl <- bikes_home %>%
+  html_nodes(css = ".catalog-navigation__link")%>%
+  html_attr('title') %>%
+  discard(.p = ~stringr::str_detect(.x, "Sale"))%>%
+  enframe(name = "position", value = "family_class") %>%
+  mutate(family_id = str_glue("#{family_class}"))%>%
+  mutate(url = glue("https://www.rosebikes.com/bikes/{family_class}"))
+
+#bike_category_url <- bike_family_tbl$url[1]
+#html_bike_category <- read_html(bike_category_url)
+
+get_bike_data <- function(url){
+ 
+  html_bike_category <- read_html(url)
+  #bike_category_url <- bike_family_tbl$url[1]
+  #html_bike_category <- read_html(bike_category_url)
+ 
+  #urls
+  bike_url_tbl <- html_bike_category %>%
+    html_nodes(css =".catalog-category-bikes__button") %>%
+    html_attr("href") %>%
+    str_remove(pattern = "\\?.*") %>%
+    enframe(name = "position",value = "part_url") %>%
+    mutate(url = glue("https://www.rosebikes.com{part_url}"))
+ 
+  #Bike Names
+  bike_name_tbl <- html_bike_category %>%
+    html_nodes(".catalog-category-bikes__title-text") %>%
+    html_text() %>%
+    str_remove(pattern = "\\n") %>%
+    str_remove(pattern = "\"") %>%
+    enframe(name = "position", value = "Name")
+ 
+  #descriptions
+  bike_desc_tbl <- html_bike_category %>%
+    html_nodes(".catalog-category-bikes__subtitle") %>%
+    html_text() %>%
+    str_remove(pattern = "\\n") %>%
+    str_remove(pattern = "\"") %>%
+    enframe(name = "position", value = "Description")
+ 
+  #prices
+  bike_price_tbl <- html_bike_category %>%
+    html_nodes(".catalog-category-bikes__price-title") %>%
+    html_text() %>%
+    str_remove(pattern = "\\n") %>%
+    str_remove(pattern = "\"") %>%
+    enframe(name = "position", value = "Price") %>%
+    left_join(bike_desc_tbl, by = character()) %>%
+    left_join(bike_name_tbl, by = character()) %>%
+    left_join(bike_url_tbl, by = character()) %>%
+    select(Name, url, Description, Price) %>%
+    as_tibble()
+}
+rose_bike_data_tbl <- tibble()
+for(i in seq_along(bike_family_tbl$url)){
+  bike_category_url <- bike_family_tbl$url[i]
+  rose_bike_data_tbl <- bind_rows(rose_bike_data_tbl, get_bike_data(bike_category_url))
+  Sys.sleep(5)
+  print(i)
+}
+
+print(rose_bike_data_tbl, n=20)
+#glimpse(rose_bike_data_tbl)
+#saveRDS(rose_bike_data_tbl, "DS_101/00_data/rose_bike_data_tbl.rds")
+
 #samples <- rnorm(100, mean=0, sd=1)
 #hist(samples)
 ```
 
 When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You'll learn that all of these things and more can be customized in each R code block.
+
+
+

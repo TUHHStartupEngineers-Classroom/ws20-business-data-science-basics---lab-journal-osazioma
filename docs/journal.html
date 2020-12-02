@@ -414,7 +414,7 @@ div.tocify {
 <p>This is an <code>.Rmd</code> file. It is plain text with special features. Any time you write just like this, it will be compiled to normal text in the website. If you put a # in front of your text, it will create a top level-header.</p>
 <div id="my-first-post" class="section level1">
 <h1><span class="header-section-number">1</span> My first post</h1>
-<p>Last compiled: 2020-12-01</p>
+<p>Last compiled: 2020-12-02</p>
 <p>Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left.</p>
 <div id="second-level-header" class="section level2">
 <h2><span class="header-section-number">1.1</span> Second level header</h2>
@@ -427,7 +427,7 @@ div.tocify {
 </div>
 <div id="my-second-post-note-the-order" class="section level1">
 <h1><span class="header-section-number">2</span> My second post (note the order)</h1>
-<p>Last compiled: 2020-12-01</p>
+<p>Last compiled: 2020-12-02</p>
 <p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
 </div>
 <div id="adding-r-stuff" class="section level1">
@@ -436,6 +436,7 @@ div.tocify {
 <p>So, let’s say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:</p>
 <pre class="r"><code>#Run libraries
 
+#libraries
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
@@ -443,6 +444,22 @@ library(readxl)
 library(readr)
 library(lubridate)
 library(&quot;writexl&quot;)
+library(genius)
+library(spotifyr)
+library(plotly)
+library(ggplot2)
+library(rvest)
+library(xopen)
+library(jsonlite)
+library(glue)
+library(stringi)
+library(furrr)
+library(RSQLite)
+library(httr)
+library(keyring)
+library(rstudioapi)
+library(stringr)
+library(purrr)
 #Importing the files
 
 bikes_tbl &lt;- read_excel(path = &quot;DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx&quot;)
@@ -619,7 +636,149 @@ albums</code></pre>
 ## 3 Sounds From The Other Side 2017-07-14             12
 ## 4 Ayo                        2014-09-17             19
 ## 5 Superstar                  2011-07-01             17</code></pre>
-<pre class="r"><code>#samples &lt;- rnorm(100, mean=0, sd=1)
+<pre class="r"><code>#Assignment3b
+source(&quot;C:/Users/osazi/Documents/ws20-business-data-science-basics---lab-journal-osazioma/Codes.R&quot;)
+artist &lt;- &quot;Ariana Grande&quot;
+artist_ID &lt;- get_artist_audio_features(artist)$artist_id[1]
+
+artist_ID</code></pre>
+<pre><code>## [1] &quot;66CXWjxzNUsdJxJ2JdwvnR&quot;</code></pre>
+<pre class="r"><code>albums &lt;- get_artist_albums(artist_ID, include_groups = c(&quot;single&quot;),
+                            authorization = access_token()) %&gt;%
+  mutate(num = row_number())%&gt;%
+  as_tibble()
+
+albums</code></pre>
+<pre><code>## # A tibble: 20 x 15
+##    album_group album_type artists available_marke~ href  id    images name 
+##    &lt;chr&gt;       &lt;chr&gt;      &lt;list&gt;  &lt;list&gt;           &lt;chr&gt; &lt;chr&gt; &lt;list&gt; &lt;chr&gt;
+##  1 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 42hb~ &lt;df[,~ Rain~
+##  2 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 7vAZ~ &lt;df[,~ Rain~
+##  3 single      single     &lt;df[,6~ &lt;chr [91]&gt;       http~ 4Tqg~ &lt;df[,~ Rain~
+##  4 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 5mUd~ &lt;df[,~ Stuc~
+##  5 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 1k1H~ &lt;df[,~ Good~
+##  6 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 62Ol~ &lt;df[,~ A Ha~
+##  7 single      single     &lt;df[,6~ &lt;chr [91]&gt;       http~ 3zVB~ &lt;df[,~ boyf~
+##  8 single      single     &lt;df[,6~ &lt;chr [28]&gt;       http~ 1V4l~ &lt;df[,~ boyf~
+##  9 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 0MbX~ &lt;df[,~ MONO~
+## 10 single      single     &lt;df[,6~ &lt;chr [28]&gt;       http~ 258Z~ &lt;df[,~ MONO~
+## 11 single      single     &lt;df[,6~ &lt;chr [91]&gt;       http~ 6FK2~ &lt;df[,~ 7 ri~
+## 12 single      single     &lt;df[,6~ &lt;chr [27]&gt;       http~ 6wV3~ &lt;df[,~ 7 ri~
+## 13 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 5DZ9~ &lt;df[,~ Some~
+## 14 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 6I3a~ &lt;df[,~ Side~
+## 15 single      single     &lt;df[,6~ &lt;chr [90]&gt;       http~ 3Uri~ &lt;df[,~ Jaso~
+## 16 single      single     &lt;df[,6~ &lt;chr [27]&gt;       http~ 6mCh~ &lt;df[,~ Jaso~
+## 17 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 3c5h~ &lt;df[,~ Into~
+## 18 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 6ec1~ &lt;df[,~ Into~
+## 19 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 6yi7~ &lt;df[,~ Chri~
+## 20 single      single     &lt;df[,6~ &lt;chr [92]&gt;       http~ 3IGM~ &lt;df[,~ Focus
+## # ... with 7 more variables: release_date &lt;chr&gt;, release_date_precision &lt;chr&gt;,
+## #   total_tracks &lt;int&gt;, type &lt;chr&gt;, uri &lt;chr&gt;, external_urls.spotify &lt;chr&gt;,
+## #   num &lt;int&gt;</code></pre>
+<pre class="r"><code>#3.2
+url_home &lt;- &quot;https://www.rosebikes.com/bikes&quot;
+bikes_home &lt;- url_home %&gt;%
+  read_html()
+
+bike_family_tbl &lt;- bikes_home %&gt;%
+  html_nodes(css = &quot;.catalog-navigation__link&quot;)%&gt;%
+  html_attr(&#39;title&#39;) %&gt;%
+  discard(.p = ~stringr::str_detect(.x, &quot;Sale&quot;))%&gt;%
+  enframe(name = &quot;position&quot;, value = &quot;family_class&quot;) %&gt;%
+  mutate(family_id = str_glue(&quot;#{family_class}&quot;))%&gt;%
+  mutate(url = glue(&quot;https://www.rosebikes.com/bikes/{family_class}&quot;))
+
+#bike_category_url &lt;- bike_family_tbl$url[1]
+#html_bike_category &lt;- read_html(bike_category_url)
+
+get_bike_data &lt;- function(url){
+ 
+  html_bike_category &lt;- read_html(url)
+  #bike_category_url &lt;- bike_family_tbl$url[1]
+  #html_bike_category &lt;- read_html(bike_category_url)
+ 
+  #urls
+  bike_url_tbl &lt;- html_bike_category %&gt;%
+    html_nodes(css =&quot;.catalog-category-bikes__button&quot;) %&gt;%
+    html_attr(&quot;href&quot;) %&gt;%
+    str_remove(pattern = &quot;\\?.*&quot;) %&gt;%
+    enframe(name = &quot;position&quot;,value = &quot;part_url&quot;) %&gt;%
+    mutate(url = glue(&quot;https://www.rosebikes.com{part_url}&quot;))
+ 
+  #Bike Names
+  bike_name_tbl &lt;- html_bike_category %&gt;%
+    html_nodes(&quot;.catalog-category-bikes__title-text&quot;) %&gt;%
+    html_text() %&gt;%
+    str_remove(pattern = &quot;\\n&quot;) %&gt;%
+    str_remove(pattern = &quot;\&quot;&quot;) %&gt;%
+    enframe(name = &quot;position&quot;, value = &quot;Name&quot;)
+ 
+  #descriptions
+  bike_desc_tbl &lt;- html_bike_category %&gt;%
+    html_nodes(&quot;.catalog-category-bikes__subtitle&quot;) %&gt;%
+    html_text() %&gt;%
+    str_remove(pattern = &quot;\\n&quot;) %&gt;%
+    str_remove(pattern = &quot;\&quot;&quot;) %&gt;%
+    enframe(name = &quot;position&quot;, value = &quot;Description&quot;)
+ 
+  #prices
+  bike_price_tbl &lt;- html_bike_category %&gt;%
+    html_nodes(&quot;.catalog-category-bikes__price-title&quot;) %&gt;%
+    html_text() %&gt;%
+    str_remove(pattern = &quot;\\n&quot;) %&gt;%
+    str_remove(pattern = &quot;\&quot;&quot;) %&gt;%
+    enframe(name = &quot;position&quot;, value = &quot;Price&quot;) %&gt;%
+    left_join(bike_desc_tbl, by = character()) %&gt;%
+    left_join(bike_name_tbl, by = character()) %&gt;%
+    left_join(bike_url_tbl, by = character()) %&gt;%
+    select(Name, url, Description, Price) %&gt;%
+    as_tibble()
+}
+rose_bike_data_tbl &lt;- tibble()
+for(i in seq_along(bike_family_tbl$url)){
+  bike_category_url &lt;- bike_family_tbl$url[i]
+  rose_bike_data_tbl &lt;- bind_rows(rose_bike_data_tbl, get_bike_data(bike_category_url))
+  Sys.sleep(5)
+  print(i)
+}</code></pre>
+<pre><code>## [1] 1
+## [1] 2
+## [1] 3
+## [1] 4
+## [1] 5
+## [1] 6
+## [1] 7
+## [1] 8
+## [1] 9</code></pre>
+<pre class="r"><code>print(rose_bike_data_tbl, n=20)</code></pre>
+<pre><code>## # A tibble: 13,622 x 4
+##    Name       url                          Description                 Price    
+##    &lt;chr&gt;      &lt;glue&gt;                       &lt;chr&gt;                       &lt;chr&gt;    
+##  1 &quot;GROUND C~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+##  2 &quot;GROUND C~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+##  3 &quot;GROUND C~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+##  4 &quot;GROUND C~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+##  5 &quot;GROUND C~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+##  6 &quot;GROUND C~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+##  7 &quot;GROUND C~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+##  8 &quot;GROUND C~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+##  9 &quot;GROUND C~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 10 &quot;ROOT MIL~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 11 &quot;ROOT MIL~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 12 &quot;ROOT MIL~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 13 &quot;ROOT MIL~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 14 &quot;ROOT MIL~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 15 &quot;ROOT MIL~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 16 &quot;ROOT MIL~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 17 &quot;ROOT MIL~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 18 &quot;ROOT MIL~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 19 &quot;PIKES PE~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## 20 &quot;PIKES PE~ https://www.rosebikes.com/b~ &quot;The versatile all-rounder~ &quot;from €1~
+## # ... with 13,602 more rows</code></pre>
+<pre class="r"><code>#glimpse(rose_bike_data_tbl)
+#saveRDS(rose_bike_data_tbl, &quot;DS_101/00_data/rose_bike_data_tbl.rds&quot;)
+
+#samples &lt;- rnorm(100, mean=0, sd=1)
 #hist(samples)</code></pre>
 <p>When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You’ll learn that all of these things and more can be customized in each R code block.</p>
 </div>
