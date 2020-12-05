@@ -276,7 +276,7 @@ for(i in seq_along(bike_family_tbl$url)){
   bike_category_url <- bike_family_tbl$url[i]
   rose_bike_data_tbl <- bind_rows(rose_bike_data_tbl, get_bike_data(bike_category_url))
   Sys.sleep(5)
-  print(i)
+  #print(i)
 }
 
 print(rose_bike_data_tbl, n=20)
@@ -285,7 +285,238 @@ print(rose_bike_data_tbl, n=20)
 
 #samples <- rnorm(100, mean=0, sd=1)
 #hist(samples)
+
 ```
+```{r exercise-4, include = TRUE, eval=FALSE, echo=TRUE}
+knitr::opts_chunk$set(eval = FALSE)
+
+library(tidyverse)
+library(vroom)
+library(data.table)
+library(furrr)
+library(tictoc)
+library(readxl)
+library(readr)
+library(ggplot2)
+library(dplyr)
+
+assignee_col_types <- list(
+  id = col_character(),
+  type = col_character(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
+
+assignee_tbl <- vroom(
+  file       = "exercise 4/assignee.tsv", 
+  delim      = "\t", 
+  col_types  = assignee_col_types,
+  na         = c("", "NA", "NULL")
+)
+
+assignee_clean_tbl <- assignee_tbl %>%
+  as_tibble() %>%
+  rename(assignee_id = id) %>%
+  select(assignee_id, type, organization)
+
+setDT(assignee_clean_tbl)
+class(assignee_clean_tbl)
+
+patent_assignee_col_types <- list(
+  patent_id = col_character(),
+  assignee_id = col_character(),
+  location_id = col_character()
+)
+
+patent_assignee_tbl <- vroom(
+  file       = "exercise 4/patent_assignee.tsv", 
+  delim      = "\t", 
+  col_types  = patent_assignee_col_types,
+  na         = c("", "NA", "NULL")
+)
+
+
+patent_assignee_clean_tbl <- patent_assignee_tbl %>%
+  as_tibble() %>%
+  select(assignee_id, patent_id)
+
+setDT(patent_assignee_clean_tbl)
+class(patent_assignee_clean_tbl)
+
+
+combined_data_1_tbl <- merge(x = patent_assignee_clean_tbl, y = assignee_clean_tbl, 
+                             by    = "assignee_id", 
+                             all.x = TRUE, 
+                             all.y = FALSE)
+
+
+combined_data_1_cleaned_tbl <- combined_data_1_tbl %>%
+  select(patent_id, type, organization)
+
+saveRDS(combined_data_1_cleaned_tbl, "exercise 4/patent_1_cleaned_data_tbl.rds")
+
+uspc_col_types <- list(
+  uuid = col_character(),
+  patent_id = col_character(),
+  mainclass_id = col_character(),
+  subclass_id = col_character(),
+  sequence = col_character()
+)
+
+
+uspc_tbl <- vroom(
+  file       = "exercise 4/uspc.tsv", 
+  delim      = "\t", 
+  col_types  = uspc_col_types,
+  na         = c("", "NA", "NULL")
+)
+
+
+uspc_clean_tbl <- uspc_tbl %>%
+  as_tibble() %>%
+  select(patent_id, mainclass_id)
+
+setDT(uspc_clean_tbl)
+class(uspc_clean_tbl)
+
+
+
+combined_data_2_tbl <- merge(x = uspc_clean_tbl, y = combined_data_1_cleaned_tbl, 
+                             by    = "patent_id", 
+                             all.x = TRUE, 
+                             all.y = FALSE)
+
+combined_data_2_cleaned_tbl <- combined_data_2_tbl %>%
+  select(patent_id, type, organization,mainclass_id)
+
+saveRDS(combined_data_2_cleaned_tbl, "exercise 4/patent_2_cleaned_data_tbl.rds")
+
+col_types <- list(
+  id = col_character(),
+  type = col_character(),
+  number = col_character(),
+  country = col_character(),
+  date = col_date("%Y-%m-%d"),
+  abstract = col_character(),
+  title = col_character(),
+  kind = col_character(),
+  num_claims = col_double(),
+  filename = col_character(),
+  withdrawn = col_double()
+)
+
+patent_tbl <- vroom(
+  file       = "exercise 4/patent.tsv", 
+  delim      = "\t", 
+  col_types  = col_types,
+  na         = c("", "NA", "NULL")
+)
+
+patent_clean_tbl <- patent_tbl %>%
+  as_tibble() %>%
+  rename(patent_id = id) %>%
+  select(patent_id, date)
+
+setDT(patent_clean_tbl)
+class(patent_clean_tbl)
+
+
+combined_data_3_tbl <- merge(x = patent_clean_tbl, y = combined_data_2_cleaned_tbl, 
+                             by    = "patent_id", 
+                             all.x = TRUE, 
+                             all.y = FALSE)
+
+
+combined_data_3_cleaned_tbl <- combined_data_3_tbl %>%
+  select(patent_id, type, date, organization, mainclass_id)
+
+
+saveRDS(combined_data_3_cleaned_tbl, "exercise 4/patent_3_cleaned_data_tbl.rds")
+
+
+assignee_pa_p_uspc_data <- readRDS("exercise 4/patent_3_cleaned_data_tbl.rds")
+
+assignee_pa_p_uspc_data_tbl <- as.data.table(assignee_pa_p_uspc_data)
+
+
+clean_try <- assignee_pa_p_uspc_data[,year := lubridate::year(date)]
+saveRDS(clean_try, "exercise 4/patent_3_cleaned_data_with_year_tbl.rds")
+
+#combination of assignee and patent_assignee datasets
+assignee_pa_data <- readRDS("exercise 4/patent_1_cleaned_data_tbl.rds")
+assignee_pa_data_tbl <- as.data.table(assignee_pa_data)
+assignee_pa <- assignee_pa_data_tbl[, .(COUNT = uniqueN(patent_id)), by = organization][order(-COUNT)]
+assignee_pa_clean <- assignee_pa[-c(4)]
+assignment_1_result <- head(assignee_pa_clean, 10)
+view(assignment_1_result)
+saveRDS(assignment_1_result, "exercise 4/result_1.rds")
+
+
+
+#combination of assignee, patent_assignee, patent, and uspc datasets
+
+assignee_pa_p_uspc_with_year_data <- readRDS("exercise 4/patent_3_cleaned_data_with_year_tbl.rds")
+assignee_pa_p_uspc_data_with_year_tbl <- as.data.table(assignee_pa_p_uspc_with_year_data)
+glimpse(assignee_pa_p_uspc_data_with_year_tbl)
+assignee_pa_p_uspc_final_tbl <- assignee_pa_p_uspc_data_with_year_tbl[year == "2019", .(COUNT = uniqueN(patent_id)), by = organization][order(-COUNT)]
+assignee_pa_p_uspc_final_tbl
+assignee_pa_p_uspc_final_tbl_clean <- assignee_pa_p_uspc_final_tbl[-c(1)]
+assignment_2_result <- head(assignee_pa_p_uspc_final_tbl_clean, 10)
+assignment_2_result
+saveRDS(assignment_2_result, "exercise 4/result_2.rds")
+
+
+
+#combination of assignee, patent_assignee, and uspc datasets
+assignee_pa_uspc_data <- readRDS("exercise 4/patent_2_cleaned_data_tbl.rds")
+assignee_pa_uspc_data_tbl <- as.data.table(assignee_pa_uspc_data)
+glimpse(assignee_pa_uspc_data_tbl)
+assignee_pa_uspc_final_tbl <- assignee_pa_uspc_data_tbl[, .(COUNT = uniqueN(patent_id)), by = .(organization, type)][order(-COUNT)]
+
+
+assignee_pa_uspc_clean <- assignee_pa_uspc_final_tbl[-c(1)]
+assignment_3a_result <- head(assignee_pa_uspc_clean, 10)
+assignment_3a_result
+saveRDS(assignment_3a_result, "exercise 4/result_3_1.rds")
+
+
+assignee_pa_uspc_final_3b_tbl <- assignee_pa_uspc_data_tbl[, .(COUNT = .N), by = type][order(-COUNT)]
+assignee_pa_uspc_3b_clean <- assignee_pa_uspc_final_3b_tbl[-c(3)]
+assignment_3b_result <- head(assignee_pa_uspc_3b_clean, 5)
+assignment_3b_result$patent_type <- c("US Company or Corporation", "Foreign Company or Corporation", "US  Federal Government", "US Individual", "Foreign Individual")
+assignment_3b_result
+saveRDS(assignment_3b_result, "exercise 4/result_3_2.rds")
+
+```
+
+```{r result_4}
+
+#View Results for Challenge 4 here
+
+#List the 10 US companies with the most assigned/granted patents
+result_1<- readRDS("exercise 4/result_1.rds")
+print(result_1)
+
+#List the top 10 companies with the most new granted patents for 2019
+result_2 <- readRDS("exercise 4/result_2.rds")
+print(result_2)
+
+#What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents
+result_3_1 <- readRDS("exercise 4/result_3_1.rds")
+print(result_3_1)
+
+#Top 5 USPTO tech main classes
+result_3_2 <- readRDS("exercise 4/result_3_2.rds")
+print(result_3_2)
+
+
+```
+
+
+
+
+
 
 When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You'll learn that all of these things and more can be customized in each R code block.
 
